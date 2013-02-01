@@ -41,7 +41,7 @@
 
         <!-- Cordova >= 2.3 -->
         <config-file target="config.xml" parent="/cordova/plugins">
-            <plugin name="ChildBrowser" value="Command"/>
+            <plugin name="ChildBrowser" value="ChildBrowserCommand"/>
         </config-file>
 
         <resource-file src="ChildBrowser.bundle" />
