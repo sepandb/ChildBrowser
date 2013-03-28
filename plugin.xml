@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.phonegap.plugins.childbrowser"
-    version="4.1.0">
+    version="4.1.1">
 
     <name>Child Browser</name>
 
@@ -26,7 +26,7 @@
         </config-file>
 
         <!-- Cordova >= 2.0.0 -->
-        <config-file target="res/xml/config.xml" parent="/cordova/plugins">
+        <config-file target="res/xml/config.xml" parent="plugins">
             <plugin name="ChildBrowser"
                 value="com.phonegap.plugins.childBrowser.ChildBrowser"/>
         </config-file>
@@ -40,7 +40,7 @@
         <plugins-plist key="ChildBrowser" string="ChildBrowserCommand" />
 
         <!-- Cordova >= 2.3 -->
-        <config-file target="config.xml" parent="/cordova/plugins">
+        <config-file target="config.xml" parent="plugins">
             <plugin name="ChildBrowser" value="ChildBrowserCommand"/>
         </config-file>
 
