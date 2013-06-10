@@ -31,7 +31,7 @@
                 value="com.phonegap.plugins.childBrowser.ChildBrowser"/>
         </config-file>
 
-        <source-file src="src/android/com/phonegap/plugins/childBrowser/ChildBrowser.java" />
+        <source-file src="src/android/com/phonegap/plugins/childBrowser/ChildBrowser.java" target-dir="src/com/phonegap/plugins/childBrowser"/>
     </platform>
     <!-- ios -->
     <platform name="ios">
