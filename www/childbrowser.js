@@ -8,6 +8,10 @@
  * (c) 2010 Jesse MacFadyen, Nitobi
  */
 
+function isFunction(arg) {
+    return typeof arg === "function";
+}
+
 // placeholder and constants
 function ChildBrowser() {}
 
