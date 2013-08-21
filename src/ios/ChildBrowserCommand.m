@@ -24,22 +24,22 @@
     return self;
 }
 
-- (void) showWebPage:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options // args: url
-{	
-    self.callbackId = [arguments objectAtIndex:0];
-	
+- (void) showWebPage:(CDVInvokedUrlCommand*)command {
+    self.callbackId = command.callbackId;
+    
     if (self.childBrowser == nil) {
         self.childBrowser = [[ChildBrowserViewController alloc] initWithScale:NO];
         self.childBrowser.delegate = self;
         self.childBrowser.orientationDelegate = self.viewController;
     }
 
+    NSMutableDictionary* options = (NSMutableDictionary*)[command argumentAtIndex:1];
     NSLog(@"showLocationBar %d",(int)[[options objectForKey:@"showLocationBar"] boolValue]);
 
     [self.viewController presentModalViewController:self.childBrowser animated:YES];
         
     // objectAtIndex 0 is the callback id
-    NSString *url = (NSString*) [arguments objectAtIndex:1];
+    NSString* url = (NSString*) [command.arguments objectAtIndex:0];
     
     [self.childBrowser resetControls];
     [self.childBrowser loadURL:url];
