@@ -29,11 +29,7 @@
     self.callbackId = [arguments objectAtIndex:0];
 	
     if (self.childBrowser == nil) {
-#if __has_feature(objc_arc)
         self.childBrowser = [[ChildBrowserViewController alloc] initWithScale:NO];
-#else
-        self.childBrowser = [[[ChildBrowserViewController alloc] initWithScale:NO] autorelease];
-#endif
         self.childBrowser.delegate = self;
         self.childBrowser.orientationDelegate = self.viewController;
     }
