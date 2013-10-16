@@ -51,7 +51,7 @@
         [childBrowser showNavigationBar:[[options objectForKey:@"showNavigationBar"] boolValue]];
 }
 
--(void) close:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options // args: url
+-(void) close:(CDVInvokedUrlCommand*)command
 {
     [self.childBrowser closeBrowser];
 	
