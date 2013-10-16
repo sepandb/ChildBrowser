@@ -38,6 +38,7 @@ import android.widget.LinearLayout;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.PluginResult;
 import org.apache.cordova.CallbackContext;
 
 public class ChildBrowser extends CordovaPlugin {
@@ -75,12 +76,12 @@ public class ChildBrowser extends CordovaPlugin {
         if (action.equals("showWebPage")) {
             Log.d(LOG_TAG, args.getString(0));
             Log.d(LOG_TAG, action);
-            this.callbackContext = callbackContext;
 
             // If the ChildBrowser is already open then throw an error
             if (dialog != null && dialog.isShowing()) {
                 callbackContext.error("ChildBrowser is already open");
             } else {
+                this.callbackContext = callbackContext;
                 result = this.showWebPage(args.getString(0), args.optJSONObject(1));
 
                 if (result.length() > 0) {
@@ -88,7 +89,7 @@ public class ChildBrowser extends CordovaPlugin {
                 } else {
                     JSONObject obj = new JSONObject();
                     obj.put("type", BROWSER_OPENED);
-                    callbackContext.success(obj);
+                    sendUpdate(obj, true);
                 }
                 Log.d(LOG_TAG, result);
             }
@@ -99,7 +100,7 @@ public class ChildBrowser extends CordovaPlugin {
             JSONObject obj = new JSONObject();
             obj.put("type", CLOSE_EVENT);
 
-            callbackContext.success(obj);
+            sendUpdate(obj, false);
             return true;
         } else if (action.equals("openExternal")) {
             result = this.openExternal(args.getString(0), args.optBoolean(1));
@@ -108,7 +109,7 @@ public class ChildBrowser extends CordovaPlugin {
             } else {
                 JSONObject obj = new JSONObject();
                 obj.put("type", OPEN_EXTERNAL_EVENT);
-                callbackContext.success(obj);
+                sendUpdate(obj, true);
             }
             return true;
         }
@@ -369,7 +370,12 @@ public class ChildBrowser extends CordovaPlugin {
      */
     private void sendUpdate(JSONObject obj, boolean keepCallback) {
         if (this.callbackContext != null) {
-            callbackContext.success(obj);
+            PluginResult pr = new PluginResult(PluginResult.Status.OK, obj);
+            pr.setKeepCallback(keepCallback);
+            callbackContext.sendPluginResult(pr);
+            Log.d("ChildBrowser", "sent plugin result via callbackContext");
+        } else {
+            Log.d("ChildBrowser", "callbackContext is null :|");
         }
     }
 
