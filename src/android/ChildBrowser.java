@@ -154,7 +154,6 @@ public class ChildBrowser extends CordovaPlugin {
      */
     private void closeDialog() {
         if (dialog != null) {
-            this.webview.stopLoading();
             dialog.dismiss();
         }
     }
@@ -225,6 +224,7 @@ public class ChildBrowser extends CordovaPlugin {
                 dialog.setCancelable(true);
                 dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     public void onDismiss(DialogInterface dialog) {
+                        webview.stopLoading();
                         try {
                             JSONObject obj = new JSONObject();
                             obj.put("type", CLOSE_EVENT);
