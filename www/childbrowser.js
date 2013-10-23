@@ -25,18 +25,18 @@ var CLOSE_EVENT = 0,
 function onEvent(data) {
     switch (data.type) {
         case CLOSE_EVENT:
-            if (isFunction(ChildBrowser.onClose)) {
-                ChildBrowser.onClose();
+            if (isFunction(window.plugins.ChildBrowser.onClose)) {
+                window.plugins.ChildBrowser.onClose();
             }
             break;
         case LOCATION_CHANGED_EVENT:
-            if (isFunction(ChildBrowser.onLocationChange)) {
-                ChildBrowser.onLocationChange(data.location);
+            if (isFunction(window.plugins.ChildBrowser.onLocationChange)) {
+                window.plugins.ChildBrowser.onLocationChange(data.location);
             }
             break;
         case OPEN_EXTERNAL_EVENT:
-            if (isFunction(ChildBrowser.onOpenExternal)) {
-                ChildBrowser.onOpenExternal();
+            if (isFunction(window.plugins.ChildBrowser.onOpenExternal)) {
+                window.plugins.ChildBrowser.onOpenExternal();
             }
             break;
     }
@@ -46,8 +46,8 @@ function onEvent(data) {
  * Function called when the child browser has an error.
  */
 function onError(data) {
-    if (isFunction(ChildBrowser.onError)) {
-        ChildBrowser.onError(data);
+    if (isFunction(window.plugins.ChildBrowser.onError)) {
+        window.plugins.ChildBrowser.onError(data);
     }
 }
 

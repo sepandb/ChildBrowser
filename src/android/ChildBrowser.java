@@ -4,13 +4,13 @@
  *
  * Copyright (c) 2005-2011, Nitobi Software Inc.
  * Copyright (c) 2010-2011, IBM Corporation
+ * Copyright (c) 2013, Takhfifan.
  */
 package com.phonegap.plugins.childBrowser;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.cordova.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,14 +36,20 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.PluginResult;
+import org.apache.cordova.CallbackContext;
 
 public class ChildBrowser extends CordovaPlugin {
 
     protected static final String LOG_TAG = "ChildBrowser";
     private static int CLOSE_EVENT = 0;
     private static int LOCATION_CHANGED_EVENT = 1;
+    private static int OPEN_EXTERNAL_EVENT = 2;
+    private static int BROWSER_OPENED = 3;
 
-    private CallbackContext browserCallbackId = null;
+    private CallbackContext callbackContext = null;
 
     private Dialog dialog;
     private WebView webview;
@@ -53,63 +59,61 @@ public class ChildBrowser extends CordovaPlugin {
     private boolean showNavigationBar = true;
 
     /**
-     * Executes the request and returns PluginResult.
+     * Executes the request and returns boolean.
      *
-     * @param action        The action to execute.
-     * @param args          JSONArry of arguments for the plugin.
-     * @param callbackId    The callback id used when calling back into JavaScript.
-     * @return              A PluginResult object with a status and message.
+     * @param action          The action to execute.
+     * @param args            JSONArry of arguments for the plugin.
+     * @param callbackContext The callback context used when calling back into JavaScript.
+     * @return                boolean
      */
-    public boolean execute(String action, JSONArray args, CallbackContext callbackId) {
-        PluginResult.Status status = PluginResult.Status.OK;
+    @Override
+    public boolean execute(String action, JSONArray args, final CallbackContext callbackContext)
+         throws JSONException
+    {
+        Log.d(LOG_TAG, action);
         String result = "";
 
-        try {
-            if (action.equals("showWebPage")) {
-                this.browserCallbackId = callbackId;
+        if (action.equals("showWebPage")) {
+            Log.d(LOG_TAG, args.getString(0));
+            Log.d(LOG_TAG, action);
 
-                // If the ChildBrowser is already open then throw an error
-                if (dialog != null && dialog.isShowing()) {
-                    this.browserCallbackId.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "ChildBrowser is already open"));
-                    return false;
-                }
-
+            // If the ChildBrowser is already open then throw an error
+            if (dialog != null && dialog.isShowing()) {
+                callbackContext.error("ChildBrowser is already open");
+            } else {
+                this.callbackContext = callbackContext;
                 result = this.showWebPage(args.getString(0), args.optJSONObject(1));
 
                 if (result.length() > 0) {
-                    status = PluginResult.Status.ERROR;
-                    this.browserCallbackId.sendPluginResult(new PluginResult(status, result));
-                    return false;
+                    callbackContext.error(result);
                 } else {
-                    PluginResult pluginResult = new PluginResult(status, result);
-                    pluginResult.setKeepCallback(true);
-                    this.browserCallbackId.sendPluginResult(pluginResult);
-                    return true;
+                    JSONObject obj = new JSONObject();
+                    obj.put("type", BROWSER_OPENED);
+                    sendUpdate(obj, true);
                 }
-            } else if (action.equals("close")) {
-                closeDialog();
-
-                JSONObject obj = new JSONObject();
-                obj.put("type", CLOSE_EVENT);
-
-                PluginResult pluginResult = new PluginResult(status, obj);
-                pluginResult.setKeepCallback(false);
-                this.browserCallbackId.sendPluginResult(pluginResult);
-                return true;
-            } else if (action.equals("openExternal")) {
-                result = this.openExternal(args.getString(0), args.optBoolean(1));
-                if (result.length() > 0) {
-                    status = PluginResult.Status.ERROR;
-                }
-            } else {
-                status = PluginResult.Status.INVALID_ACTION;
+                Log.d(LOG_TAG, result);
             }
-            this.browserCallbackId.sendPluginResult(new PluginResult(status, result));
             return true;
-        } catch (JSONException e) {
-            this.browserCallbackId.sendPluginResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION));
-            return false;
+        } else if (action.equals("close")) {
+            closeDialog();
+
+            JSONObject obj = new JSONObject();
+            obj.put("type", CLOSE_EVENT);
+
+            sendUpdate(obj, false);
+            return true;
+        } else if (action.equals("openExternal")) {
+            result = this.openExternal(args.getString(0), args.optBoolean(1));
+            if (result.length() > 0) {
+                callbackContext.error(result);
+            } else {
+                JSONObject obj = new JSONObject();
+                obj.put("type", OPEN_EXTERNAL_EVENT);
+                sendUpdate(obj, true);
+            }
+            return true;
         }
+        return false;
     }
 
     /**
@@ -150,7 +154,6 @@ public class ChildBrowser extends CordovaPlugin {
      */
     private void closeDialog() {
         if (dialog != null) {
-            this.webview.stopLoading();
             dialog.dismiss();
         }
     }
@@ -221,6 +224,7 @@ public class ChildBrowser extends CordovaPlugin {
                 dialog.setCancelable(true);
                 dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     public void onDismiss(DialogInterface dialog) {
+                        webview.stopLoading();
                         try {
                             JSONObject obj = new JSONObject();
                             obj.put("type", CLOSE_EVENT);
@@ -365,10 +369,13 @@ public class ChildBrowser extends CordovaPlugin {
      * @param obj a JSONObject contain event payload information
      */
     private void sendUpdate(JSONObject obj, boolean keepCallback) {
-        if (this.browserCallbackId != null) {
-            PluginResult result = new PluginResult(PluginResult.Status.OK, obj);
-            result.setKeepCallback(keepCallback);
-            this.browserCallbackId.sendPluginResult(result);
+        if (this.callbackContext != null) {
+            PluginResult pr = new PluginResult(PluginResult.Status.OK, obj);
+            pr.setKeepCallback(keepCallback);
+            callbackContext.sendPluginResult(pr);
+            Log.d("ChildBrowser", "sent plugin result via callbackContext");
+        } else {
+            Log.d("ChildBrowser", "callbackContext is null :|");
         }
     }
 

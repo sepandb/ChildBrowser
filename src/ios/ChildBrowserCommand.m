@@ -4,6 +4,7 @@
 //  Copyright (c) 2011, IBM Corporation
 //  Copyright 2011, Randy McMillan
 //  Copyright 2012, Andrew Lunny, Adobe Systems
+//  Copyright 2013, Behrooz Shabani, Takhfifan
 //
 
 #import "ChildBrowserCommand.h"
@@ -51,7 +52,7 @@
         [childBrowser showNavigationBar:[[options objectForKey:@"showNavigationBar"] boolValue]];
 }
 
--(void) close:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options // args: url
+-(void) close:(CDVInvokedUrlCommand*)command
 {
     [self.childBrowser closeBrowser];
 	
