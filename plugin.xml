@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android"
-    id="com.phonegap.plugins.childbrowser" version="3.0.4">
+    id="com.phonegap.plugins.childbrowser" version="5.0.0">
 
     <name>Child Browser</name>
     <description>Child Browser Plugin</description>
     <license>Apache 2.0</license>
     <keywords>phonegap,browser</keywords>
+
+    <engines>
+        <engine name="cordova" version=">=3.0.0" />
+    </engines>
 
     <js-module src="www/childbrowser.js" name="ChildBrowser">
         <clobbers target="ChildBrowser" />
